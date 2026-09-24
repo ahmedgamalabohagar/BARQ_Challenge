@@ -22,6 +22,16 @@ x-app: &app
     timeout: 3s
     retries: 3
     start_period: 3s
+  deploy:
+    resources:
+      limits:
+        cpus: "0.5"
+        memory: 256M
+      reservations:
+        cpus: "0.1"
+        memory: 128M
+  security_opt: ["no-new-privileges:true"]
+  cap_drop: [ALL]
   read_only: true
   tmpfs: [/tmp]
   networks: [frontend, backend]
@@ -45,6 +55,14 @@ services:
       interval: 3s
       timeout: 3s
       retries: 10
+    deploy:
+      resources:
+        limits:
+          cpus: "0.75"
+          memory: 512M
+        reservations:
+          cpus: "0.25"
+          memory: 256M
     networks: [backend]
 
   redis:
@@ -58,6 +76,14 @@ services:
       interval: 3s
       timeout: 2s
       retries: 5
+    deploy:
+      resources:
+        limits:
+          cpus: "0.25"
+          memory: 128M
+        reservations:
+          cpus: "0.05"
+          memory: 64M
     networks: [backend]
 
   app-01:
@@ -93,6 +119,14 @@ services:
         condition: service_healthy
       app-02:
         condition: service_healthy
+    deploy:
+        resources:
+          limits:
+            cpus: "0.25"
+            memory: 64M
+          reservations:
+            cpus: "0.05"
+            memory: 32M
     networks: [frontend]
 
 networks:
