@@ -1,0 +1,61 @@
+name: Barq Academy CI Pipeline
+
+on:
+  push:
+    branches: [ "main", "master", "dev", "feature/*", "fix/*"]
+  pull_request:
+    branches: [ "main", "master" ]
+  workflow_dispatch:
+
+jobs:
+  ci-build-and-validate:
+    name: Build, Deploy and Validate System
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Create Secrets and Environment Files from GitHub Secrets
+        run: |
+          mkdir -p secrets
+          echo "${{ secrets.POSTGRES_PASSWORD }}" > secrets/postgres_password
+
+          cat <<EOF > app.env
+          POSTGRES_USER=${{ secrets.POSTGRES_USER }}
+          POSTGRES_DB=${{ secrets.POSTGRES_DB }}
+          DATABASE_URL=${{ secrets.DATABASE_URL }}
+          REDIS_URL=${{ secrets.REDIS_URL }}
+          PUBLIC_PORT=8080
+          EOF
+
+          cp app.env .env
+
+      - name: Check Docker Compose Syntax
+        run: |
+          docker compose config
+
+      - name: Build Docker Images
+        run: |
+          docker compose build
+
+      - name: Start Services
+        run: |
+          docker compose up -d
+
+      - name: Set Executable Permissions
+        run: |
+          chmod +x scripts/validate.sh scripts/failure_test.sh scripts/backup.sh scripts/restore.sh
+
+      - name: Run System Validation
+        run: |
+          ./scripts/validate.sh
+
+      - name: Run Failure and Recovery Test
+        run: |
+          ./scripts/failure_test.sh
+
+      - name: Tear Down Services
+        if: always()
+        run: |
+          docker compose down -v
