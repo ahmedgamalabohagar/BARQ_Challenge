@@ -21,7 +21,7 @@ ready_file=$(mktemp)
 
 for (( i=1 ; i<=max_retries ; i++ )); do
     HTTP_CODE=$(curl -s -o "$ready_file" -w "%{http_code}" "${BASE_URL}/ready" || true)
-    if [ "${HTTP_CODE} -eq 200" ]; then
+    if [ "${HTTP_CODE}" -eq 200 ]; then
         ready=true
         break
     fi 
@@ -94,6 +94,3 @@ else
     log_fail "validation faild ,checks logs :( "
     exit 1
 fi
-
-
-
