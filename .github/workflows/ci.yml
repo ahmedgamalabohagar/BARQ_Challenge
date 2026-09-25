@@ -21,7 +21,7 @@ jobs:
           mkdir -p secrets
           echo "${{ secrets.POSTGRES_PASSWORD }}" > secrets/postgres_password
 
-          cat <<EOF > app.env
+          cat <<EOF > config/app.env
           POSTGRES_USER=${{ secrets.POSTGRES_USER }}
           POSTGRES_DB=${{ secrets.POSTGRES_DB }}
           DATABASE_URL=${{ secrets.DATABASE_URL }}
@@ -29,7 +29,7 @@ jobs:
           PUBLIC_PORT=8080
           EOF
 
-          cp app.env .env
+          cp config/app.env .env
 
       - name: Check Docker Compose Syntax
         run: |
@@ -45,15 +45,15 @@ jobs:
 
       - name: Set Executable Permissions
         run: |
-          chmod +x scripts/validate.sh scripts/failure_test.sh scripts/backup.sh scripts/restore.sh
+          chmod +x validate.sh failure_test.sh backup.sh restore.sh
 
       - name: Run System Validation
         run: |
-          ./scripts/validate.sh
+          validate.sh
 
       - name: Run Failure and Recovery Test
         run: |
-          ./scripts/failure_test.sh
+          failure_test.sh
 
       - name: Tear Down Services
         if: always()
