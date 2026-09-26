@@ -26,7 +26,7 @@ jobs:
           POSTGRES_DB=${{ secrets.POSTGRES_DB }}
           DATABASE_URL=${{ secrets.DATABASE_URL }}
           REDIS_URL=${{ secrets.REDIS_URL }}
-          PUBLIC_PORT=8080
+          PUBLIC_PORT=8090
           EOF
 
           cp config/app.env .env
