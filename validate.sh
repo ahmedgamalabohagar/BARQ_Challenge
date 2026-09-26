@@ -2,7 +2,7 @@
 
 set -euo pipefail
 
-BASE_URL="${BASE_URL:-http://localhost:8080}"
+BASE_URL="${BASE_URL:-http://localhost:8090}"
 max_retries=15
 sleep_interval=2
 failed=0
@@ -55,6 +55,7 @@ rm -f "$ready_file"
 log_info "verifying (app-01,app-02)"
 found_app1=false
 found_app2=false
+found_app3=false
 
 for i in {1..10}; do
     instance_id=$(curl -s -i  "${BASE_URL}/ready" | grep -i "x-instance-id:" | tr -d '\r' | awk '{print $2}' || true )
@@ -62,10 +63,12 @@ for i in {1..10}; do
         found_app1=true
     elif [ "$instance_id" = "app-02" ]; then
         found_app2=true
+    elif [ "$instance_id" = "app-03" ]; then
+	found_app3=true
     fi
 done
 
-if [ "$found_app1" = true ] && [ "$found_app2" = true ]; then
+if [ "$found_app1" = true ] && [ "$found_app2" = true ] && [ "$found_app3" = true ]; then
     log_pass  "both (app-01 and app-02) working successfully "
 else
     log_fail  "load balancing failure ( app-01 reached: ${found_app1} , app-02 reached: ${found_app2})"
