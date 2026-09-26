@@ -18,7 +18,7 @@ jobs:
 
       - name: Create Secrets and Environment Files from GitHub Secrets
         run: |
-          mkdir -p secrets
+          mkdir -p secrets config
           echo "${{ secrets.POSTGRES_PASSWORD }}" > secrets/postgres_password
 
           cat <<EOF > config/app.env
@@ -49,11 +49,11 @@ jobs:
 
       - name: Run System Validation
         run: |
-          validate.sh
+          ./validate.sh
 
       - name: Run Failure and Recovery Test
         run: |
-          failure_test.sh
+          ./failure_test.sh
 
       - name: Tear Down Services
         if: always()
